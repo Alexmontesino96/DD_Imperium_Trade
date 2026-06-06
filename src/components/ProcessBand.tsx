@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { type Copy } from "@/lib/ddi-data";
 import {
   Easing,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/animations";
 import { COL, MONO, SANS, ParcelBox, Vehicle } from "./ddi-video-parts";
 import { SectionLabel } from "./ddi-ui";
+import { ProcessVideo } from "./ProcessVideo";
 
 const W = 1760;
 const H = 440;
@@ -483,6 +484,15 @@ function Scene({
 }
 
 export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth <= 700);
+    fn();
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+
   const words: [string, string, string] =
     lang === "es"
       ? ["Abastecemos", "Preparamos", "Enviamos"]
@@ -515,6 +525,13 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
           </SectionLabel>
         </div>
       </div>
+      {mobile ? (
+        <div className="ddi-container">
+          <div className="ddi-vid-frame">
+            <ProcessVideo />
+          </div>
+        </div>
+      ) : (
       <div className="ddi-band-frame">
         <Stage width={W} height={H} duration={DUR} background={COL.bg}>
           <Scene
@@ -525,6 +542,7 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
           />
         </Stage>
       </div>
+      )}
     </section>
   );
 }

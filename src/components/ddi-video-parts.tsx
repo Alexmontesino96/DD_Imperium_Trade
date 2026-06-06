@@ -1,6 +1,7 @@
 "use client";
 
-import { useSprite } from "@/lib/animations";
+import { CSSProperties, ReactNode } from "react";
+import { Easing, clamp, useSprite, useTime } from "@/lib/animations";
 
 export const COL = {
   bg: "#0c0a07",
@@ -262,4 +263,140 @@ export function Vehicle({
 
 export function useVehicleAt() {
   return useSprite();
+}
+
+/* ---------- background: warehouse floor + drifting grid ---------- */
+export function Floor() {
+  const t = useTime();
+  const drift = (t * 14) % 80;
+  return (
+    <div style={{
+      position: "absolute", inset: 0,
+      background: "radial-gradient(120% 90% at 70% 8%, #1a140c 0%, #0c0a07 60%)",
+      overflow: "hidden",
+    }}>
+      <div style={{
+        position: "absolute", left: "-20%", right: "-20%", bottom: 0, height: "46%",
+        background: "linear-gradient(180deg, transparent, rgba(212,181,110,0.05))",
+        backgroundImage:
+          "repeating-linear-gradient(90deg, transparent 0 78px, rgba(212,181,110,0.10) 78px 80px)",
+        transform: "perspective(620px) rotateX(58deg)", transformOrigin: "bottom",
+        maskImage: "linear-gradient(180deg, transparent, #000 40%)",
+        WebkitMaskImage: "linear-gradient(180deg, transparent, #000 40%)",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, opacity: 0.5,
+        backgroundImage: "repeating-linear-gradient(90deg, transparent 0 119px, rgba(212,181,110,0.05) 119px 120px)",
+        backgroundPositionX: -drift + "px",
+        maskImage: "radial-gradient(80% 70% at 50% 30%, #000, transparent 80%)",
+        WebkitMaskImage: "radial-gradient(80% 70% at 50% 30%, #000, transparent 80%)",
+      }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(50% 44% at 72% 18%, rgba(212,181,110,0.14), transparent 60%)" }} />
+      <div style={{ position: "absolute", inset: 0, boxShadow: "inset 0 0 220px 60px rgba(0,0,0,0.7)" }} />
+    </div>
+  );
+}
+
+/* ---------- camera wrapper (zoom + pan) ---------- */
+export function Camera({ from, to, children }: {
+  from: { x: number; y: number; z: number };
+  to: { x: number; y: number; z: number };
+  children: ReactNode;
+}) {
+  const { progress } = useSprite();
+  const e = Easing.easeInOutCubic(progress);
+  const z = from.z + (to.z - from.z) * e;
+  const x = from.x + (to.x - from.x) * e;
+  const y = from.y + (to.y - from.y) * e;
+  return (
+    <div style={{
+      position: "absolute", inset: 0,
+      transform: `scale(${z}) translate(${x}px, ${y}px)`,
+      transformOrigin: "center", willChange: "transform",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+/* ---------- logo tile (uses /ddi-logo.png) ---------- */
+export function LogoTile({ size = 84 }: { size?: number }) {
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src="/ddi-logo.png"
+      alt="D&D Imperium Trade"
+      style={{
+        height: Math.round(size * 1.16), width: "auto", display: "block",
+        filter: "drop-shadow(0 6px 18px rgba(154,124,67,0.45))",
+      }}
+    />
+  );
+}
+
+/* ---------- station marker ---------- */
+export function StationRing({ active = true, icon }: { active?: boolean; icon: ReactNode }) {
+  return (
+    <div style={{
+      width: 84, height: 84, borderRadius: "50%", display: "grid", placeItems: "center",
+      background: active ? "rgba(212,181,110,0.16)" : COL.panel,
+      border: "1px solid " + (active ? "rgba(212,181,110,0.5)" : COL.line),
+      boxShadow: active ? "0 0 0 8px rgba(212,181,110,0.07)" : "none",
+      color: active ? COL.goldLight : COL.dimmer,
+    }}>
+      {icon}
+    </div>
+  );
+}
+
+/* ---------- step caption ---------- */
+export function StepCaption({ num, title, desc, x, y, prog }: {
+  num: string; title: string; desc: string; x: number; y: number; prog: number;
+}) {
+  const e = Easing.easeOutCubic(clamp(prog, 0, 1));
+  return (
+    <div style={{
+      position: "absolute", left: x, top: y, width: 460,
+      opacity: e, transform: `translateY(${(1 - e) * 18}px)`,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+        <span style={{
+          fontFamily: MONO, fontSize: 15, fontWeight: 700,
+          letterSpacing: "2px", color: COL.gold, whiteSpace: "nowrap",
+        }}>PASO {num}</span>
+        <span style={{ height: 1, width: 40 * e, background: COL.gold }} />
+      </div>
+      <div style={{
+        fontFamily: SANS, fontSize: 52, fontWeight: 800,
+        letterSpacing: "-1.5px", color: COL.text, lineHeight: 1.02,
+      }}>{title}</div>
+      <div style={{
+        fontFamily: SANS, fontSize: 19, lineHeight: 1.5,
+        color: COL.dim, marginTop: 16, maxWidth: 420,
+      }}>{desc}</div>
+    </div>
+  );
+}
+
+/* ---------- marketplace tag ---------- */
+export function MarketTag({ label, delay = 0 }: { label: string; delay?: number }) {
+  const { localTime } = useSprite();
+  const e = Easing.easeOutBack(clamp((localTime - delay) / 0.5, 0, 1));
+  const opacity = clamp((localTime - delay) / 0.4, 0, 1);
+  const style: CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 9,
+    padding: "11px 20px", borderRadius: 999,
+    background: COL.panel, border: "1px solid " + COL.line,
+    fontFamily: MONO, fontSize: 18, fontWeight: 600, color: COL.text,
+    opacity, transform: `scale(${0.7 + e * 0.3})`,
+  };
+  return (
+    <span style={style}>
+      <span style={{
+        width: 8, height: 8, borderRadius: "50%",
+        background: COL.gold, boxShadow: "0 0 8px " + COL.gold,
+      }} />
+      {label}
+    </span>
+  );
 }

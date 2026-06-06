@@ -1074,3 +1074,6 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
   .ddi-nav-actions { display: none; }
   .ddi-nav-in { height: 62px; }
 }
+
+/* Mobile process video frame (16:9 replacement for horizontal band) */
+.ddi-vid-frame { position: relative; width: 100%; aspect-ratio: 1280 / 720; margin: 8px auto 0; border-radius: 18px; overflow: hidden; border: 1px solid var(--border-3); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
