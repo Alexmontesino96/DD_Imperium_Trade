@@ -134,11 +134,17 @@ export const data = {
 
   sampleCatalog: [
     { product: "Crema facial hidratante 50 ml", brand: "Lumière", cat: { es: "Beauty & Personal Care", en: "Beauty & Personal Care" }, market: "Amazon" },
-    { product: "Sérum facial vitamina C", brand: "PureGlow", cat: { es: "Beauty & Personal Care", en: "Beauty & Personal Care" }, market: "Walmart" },
+    { product: "Sérum facial vitamina C 30 ml", brand: "PureGlow", cat: { es: "Beauty & Personal Care", en: "Beauty & Personal Care" }, market: "Walmart" },
+    { product: "Set de cuidado capilar (3 pzs)", brand: "Botánica", cat: { es: "Beauty & Personal Care", en: "Beauty & Personal Care" }, market: "Amazon" },
+    { product: "Crema corporal karité 250 ml", brand: "Aura", cat: { es: "Beauty & Personal Care", en: "Beauty & Personal Care" }, market: "Amazon" },
     { product: "Café tostado premium 1 kg", brand: "Andes Roast", cat: { es: "Grocery", en: "Grocery" }, market: "Amazon" },
     { product: "Barras de proteína (caja 12)", brand: "VitaBar", cat: { es: "Grocery", en: "Grocery" }, market: "Walmart" },
-    { product: "Juego de sábanas de algodón", brand: "Casa Lino", cat: { es: "House & Hold", en: "House & Hold" }, market: "Amazon" },
-    { product: "Set organizador de cocina", brand: "HogarPro", cat: { es: "House & Hold", en: "House & Hold" }, market: "Walmart" },
+    { product: "Aceite de oliva extra virgen 750 ml", brand: "Olivar", cat: { es: "Grocery", en: "Grocery" }, market: "Amazon" },
+    { product: "Mantequilla de maní natural 500 g", brand: "NutriDay", cat: { es: "Grocery", en: "Grocery" }, market: "Walmart" },
+    { product: "Juego de sábanas de algodón Queen", brand: "Casa Lino", cat: { es: "House & Hold", en: "House & Hold" }, market: "Amazon" },
+    { product: "Set organizador de cocina (5 pzs)", brand: "HogarPro", cat: { es: "House & Hold", en: "House & Hold" }, market: "Walmart" },
+    { product: "Lámpara LED de escritorio regulable", brand: "Lumio", cat: { es: "House & Hold", en: "House & Hold" }, market: "Amazon" },
+    { product: "Juego de toallas premium (4 pzs)", brand: "Nórdico", cat: { es: "House & Hold", en: "House & Hold" }, market: "Amazon" },
   ] as SampleCatalogRow[],
 };
 

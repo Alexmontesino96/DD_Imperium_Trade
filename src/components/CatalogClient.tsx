@@ -1,262 +1,270 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useState } from "react";
-import { copy, data as DDI_DATA, type Lang } from "@/lib/ddi-data";
-import { DDIcon, SectionLabel } from "./ddi-ui";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { data as DDI_DATA } from "@/lib/ddi-data";
 
-const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+type CategoryId = "all" | "beauty" | "grocery" | "house";
 
-const CATEGORY_LABELS: Record<Lang, Record<string, string>> = {
-  es: {
-    "Beauty & Personal Care": "Belleza y cuidado personal",
-    Grocery: "Alimentos y bebidas",
-    "House & Hold": "Hogar",
-  },
-  en: {
-    "Beauty & Personal Care": "Beauty & Personal Care",
-    Grocery: "Grocery",
-    "House & Hold": "House & Hold",
-  },
-};
+const CATEGORIES: Array<{ id: Exclude<CategoryId, "all">; name: string; matches: string }> = [
+  { id: "beauty", name: "Beauty & Personal Care", matches: "Beauty & Personal Care" },
+  { id: "grocery", name: "Grocery", matches: "Grocery" },
+  { id: "house", name: "House & Hold", matches: "House & Hold" },
+];
 
-const T: Record<Lang, {
-  pageTitle: string;
-  pageSub: string;
-  badge: string;
-  back: string;
-  sampleLabel: string;
-  unlock: string;
-  unlockSub: string;
-  bullets: string[];
-  formLabel: string;
-  formCta: string;
-  formNote: string;
-  done: string;
-  doneSub: string;
-  lockTitle: string;
-}> = {
-  es: {
-    pageTitle: "Catálogo de muestra",
-    pageSub:
-      "Una selección de las tres categorías que distribuimos. El catálogo completo se desbloquea cuando te registras como vendedor verificado.",
-    badge: "Muestra · sin precios",
-    back: "Volver al inicio",
-    sampleLabel: "Muestra disponible",
-    unlock: "Desbloquea el catálogo completo",
-    unlockSub:
-      "Regístrate como vendedor y, una vez verificado, accedes a precios, stock y disponibilidad de todas las referencias.",
-    bullets: [
-      "Precios mayoristas por unidad",
-      "Stock y disponibilidad en tiempo real",
-      "Asesor directo asignado",
-    ],
-    formLabel: "Déjanos tu email y un asesor te contacta hoy mismo.",
-    formCta: "Solicitar acceso completo",
-    formNote: "Sin costo · Sin compromiso · Atención directa",
-    done: "¡Listo! Recibimos tu solicitud.",
-    doneSub:
-      "En las próximas horas un asesor te contacta para verificarte y darte acceso al catálogo completo.",
-    lockTitle: "Catálogo completo",
-  },
-  en: {
-    pageTitle: "Sample catalog",
-    pageSub:
-      "A selection across the three categories we distribute. The full catalog unlocks when you register as a verified seller.",
-    badge: "Sample · no pricing",
-    back: "Back to home",
-    sampleLabel: "Sample available",
-    unlock: "Unlock the full catalog",
-    unlockSub:
-      "Register as a seller and, once verified, you get pricing, stock, and availability for every SKU.",
-    bullets: [
-      "Wholesale per-unit pricing",
-      "Real-time stock and availability",
-      "Direct advisor assigned",
-    ],
-    formLabel: "Leave your email and an advisor reaches out today.",
-    formCta: "Request full access",
-    formNote: "No cost · No commitment · Direct support",
-    done: "Done! We received your request.",
-    doneSub:
-      "An advisor will reach out in the next few hours to verify you and grant access to the full catalog.",
-    lockTitle: "Full catalog",
-  },
-};
-
-function CategoryIcon({ name }: { name: string }) {
+function BoxIcon() {
   return (
-    <DDIcon
-      name={
-        name === "Beauty & Personal Care"
-          ? "spark"
-          : name === "Grocery"
-          ? "source"
-          : "building"
-      }
-      size={16}
-      stroke="var(--brand-mid)"
-    />
+    <svg className="ic" width="34" height="34" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10" />
+    </svg>
   );
 }
 
+function LockIcon({ size = 13, stroke = "currentColor", strokeWidth = 2.2 }: { size?: number; stroke?: string; strokeWidth?: number }) {
+  return (
+    <svg className="ic" width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  );
+}
+
+function CheckIcon({ size = 17 }: { size?: number }) {
+  return (
+    <svg className="ic" width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="var(--ok-soft)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12l5 5L20 6" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon() {
+  return (
+    <svg className="ic" width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M11 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg className="ic" width="17" height="17" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+function useReveal() {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    root.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+  return rootRef;
+}
+
 export function CatalogClient() {
-  const [lang, setLangState] = useState<Lang>("es");
+  const [active, setActive] = useState<CategoryId>("all");
+  const rootRef = useReveal();
 
+  const products = DDI_DATA.sampleCatalog;
+
+  const sections = useMemo(() => {
+    const cats = active === "all" ? CATEGORIES : CATEGORIES.filter((c) => c.id === active);
+    return cats.map((c) => ({
+      cat: c,
+      items: products.filter((p) => p.cat.es === c.matches),
+    }));
+  }, [active, products]);
+
+  // Re-trigger reveal when filter changes
   useEffect(() => {
-    const stored = (typeof window !== "undefined" && localStorage.getItem("ddi-lang")) as Lang | null;
-    if (stored === "es" || stored === "en") setLangState(stored);
-  }, []);
-
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l);
-    if (typeof window !== "undefined") localStorage.setItem("ddi-lang", l);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  const c = copy[lang];
-  const t = T[lang];
-
-  const grouped: Record<string, typeof DDI_DATA.sampleCatalog> = {};
-  for (const row of DDI_DATA.sampleCatalog) {
-    const key = row.cat[lang] || row.cat.es;
-    grouped[key] = grouped[key] || [];
-    grouped[key].push(row);
-  }
-
-  const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
-  const valid = emailRe.test(email);
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (valid) setDone(true);
-  };
-
-  const noop = () => {};
+    const root = rootRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll(".reveal");
+    els.forEach((el) => el.classList.remove("in"));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [active, rootRef]);
 
   return (
-    <div className="ddi-root" data-theme="dark" data-accent="champagne" data-bg="malla">
-      <Header c={c} lang={lang} setLang={setLang} onCatalog={noop} onPartner={noop} />
-
-      <main>
-        <section className="ddi-cat-hero">
-          <div className="ddi-container">
-            <Link href="/" className="ddi-cat-back">
-              <DDIcon name="arrow" size={14} style={{ transform: "rotate(180deg)" }} />
-              {t.back}
+    <div ref={rootRef} className="ddi-root ddi-cat-page" data-theme="dark" data-accent="champagne" data-bg="malla">
+      <header className="hdr">
+        <div className="wrap hdr-in">
+          <Link className="brand" href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="logo-mark" src="/ddi-logo.png" alt="D&D Imperium Trade" />
+            <span className="brand-word">Imperium <b>Trade</b></span>
+          </Link>
+          <div className="hdr-actions">
+            <Link className="hdr-back" href="/">
+              <ArrowLeftIcon />
+              Inicio
             </Link>
-            <SectionLabel>{t.badge}</SectionLabel>
-            <h1 className="ddi-cat-title">{t.pageTitle}</h1>
-            <p className="ddi-cat-sub">{t.pageSub}</p>
+            <Link className="cat-btn" href="/#contact">
+              Solicita el catálogo
+            </Link>
           </div>
-        </section>
+        </div>
+      </header>
 
-        <section className="ddi-cat-body">
-          <div className="ddi-container">
-            {Object.entries(grouped).map(([category, items]) => (
-              <div key={category} className="ddi-cat-section">
-                <div className="ddi-cat-section-head">
-                  <CategoryIcon name={items[0].cat.es} />
-                  <h2 className="ddi-cat-section-title">{CATEGORY_LABELS[lang][items[0].cat.es] || category}</h2>
-                  <span className="ddi-cat-count mono">
-                    {items.length} {lang === "es" ? "muestras" : "samples"}
-                  </span>
-                </div>
-                <div className="ddi-cat-grid">
-                  {items.map((row, i) => (
-                    <article key={i} className="ddi-cat-card">
-                      <div className="ddi-cat-card-media">
-                        <DDIcon name="source" size={28} stroke="var(--brand-mid)" />
-                        <span className="ddi-cat-card-badge">{row.market}</span>
-                      </div>
-                      <div className="ddi-cat-card-body">
-                        <div className="ddi-cat-card-brand">{row.brand}</div>
-                        <h3 className="ddi-cat-card-name">{row.product}</h3>
-                        <div className="ddi-cat-card-meta">
-                          <span className="ddi-cat-card-sample">
-                            <DDIcon name="check" size={12} stroke="var(--ok-soft)" />
-                            {t.sampleLabel}
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ))}
+      <section className="cat-hero">
+        <div className="wrap">
+          <div className="eyebrow">
+            <span />
+            Catálogo
           </div>
-        </section>
+          <h1>
+            Producto verificado, listo para <em>Amazon y Walmart</em>.
+          </h1>
+          <p>
+            Una muestra de lo que distribuimos en tres categorías. El catálogo completo —con
+            precios, márgenes y disponibilidad— se desbloquea al registrarte como vendedor
+            verificado.
+          </p>
+        </div>
+      </section>
 
-        <section className="ddi-cat-gate" id="acceso">
-          <div className="ddi-container">
-            <div className="ddi-cat-gate-card">
-              <div className="ddi-cat-gate-lock">
-                <DDIcon name="lock" size={22} stroke="var(--brand-primary)" />
-                <span>{t.lockTitle}</span>
-              </div>
-              <h2 className="ddi-cat-gate-title">{t.unlock}</h2>
-              <p className="ddi-cat-gate-sub">{t.unlockSub}</p>
-              <ul className="ddi-cat-gate-list">
-                {t.bullets.map((b) => (
-                  <li key={b}>
-                    <DDIcon name="badgeCheck" size={16} stroke="var(--brand-mid)" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-              {done ? (
-                <div className="ddi-cat-gate-done">
-                  <div className="ddi-success-icon">
-                    <DDIcon name="check" size={26} stroke="var(--ok-soft)" />
-                  </div>
-                  <div>
-                    <h3 className="ddi-cat-gate-done-title">{t.done}</h3>
-                    <p className="ddi-cat-gate-done-sub">{t.doneSub}</p>
-                  </div>
-                </div>
-              ) : (
-                <form className="ddi-cat-gate-form" onSubmit={onSubmit}>
-                  <label className="ddi-cat-gate-label" htmlFor="cat-email">
-                    {t.formLabel}
-                  </label>
-                  <div className="ddi-cat-gate-row">
-                    <input
-                      id="cat-email"
-                      className="ddi-input"
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button type="submit" className="ddi-btn ddi-btn-primary ddi-btn-lg" disabled={!valid}>
-                      {t.formCta}
-                      <DDIcon name="arrow" size={16} />
-                    </button>
-                  </div>
-                  <p className="ddi-cat-gate-note">{t.formNote}</p>
-                </form>
-              )}
+      <div className="filters">
+        <div className="wrap filters-in">
+          {([{ id: "all" as const, name: "Todos" }, ...CATEGORIES]).map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              className={"chip" + (active === c.id ? " active" : "")}
+              onClick={() => setActive(c.id as CategoryId)}
+            >
+              {c.name}
+            </button>
+          ))}
+          <span className="filters-count">{products.length} productos de muestra</span>
+        </div>
+      </div>
+
+      <main className="wrap">
+        {sections.map(({ cat, items }) => (
+          <section className="cat-sec" key={cat.id}>
+            <div className="cat-sec-head reveal">
+              <h2>{cat.name}</h2>
+              <span className="cnt">{items.length} productos</span>
             </div>
-          </div>
-        </section>
+            <div className="grid">
+              {items.map((p, idx) => (
+                <article
+                  key={`${cat.id}-${idx}`}
+                  className="card reveal"
+                  style={{ transitionDelay: `${(idx % 4) * 0.05}s` }}
+                >
+                  <div className="card-media">
+                    <div className="card-ph">
+                      <BoxIcon />
+                    </div>
+                    <span className="card-badge">{p.market}</span>
+                  </div>
+                  <div className="card-body">
+                    <div className="card-brand">{p.brand}</div>
+                    <h3 className="card-name">{p.product}</h3>
+                    <div className="card-locked">
+                      <span className="lk">
+                        <LockIcon />
+                        Costo <span className="blur">$00.00</span>
+                      </span>
+                      <span className="unlock">Desbloquear</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ))}
       </main>
 
-      <Footer c={c} />
+      <section className="wrap">
+        <div className="gate">
+          <div>
+            <span className="gate-lock">
+              <LockIcon size={15} stroke="var(--brand-mid)" strokeWidth={2} />
+              Catálogo completo
+            </span>
+            <h3>Desbloquea precios, márgenes y disponibilidad.</h3>
+            <p>
+              Regístrate como vendedor. Una vez verificado, accedes al catálogo completo y un
+              asesor te contacta. Sin costo, sin compromiso.
+            </p>
+          </div>
+          <div>
+            <ul className="gate-list" style={{ marginBottom: 18 }}>
+              <li>
+                <CheckIcon />
+                Precio de costo y margen por producto
+              </li>
+              <li>
+                <CheckIcon />
+                Disponibilidad y volumen mínimo
+              </li>
+              <li>
+                <CheckIcon />
+                Mejor canal por producto
+              </li>
+            </ul>
+            <div className="gate-form">
+              <Link className="cat-btn" href="/#contact">
+                Crear cuenta y desbloquear
+                <ArrowRightIcon />
+              </Link>
+              <Link
+                href="/#contact"
+                style={{
+                  textAlign: "center",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "var(--brand-mid)",
+                  paddingTop: 4,
+                }}
+              >
+                ¿Ya tienes cuenta? Inicia sesión
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <a
-        className="ddi-wa-fab"
-        href={"https://wa.me/" + DDI_DATA.whatsapp.replace(/[^0-9]/g, "")}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="WhatsApp"
-      >
-        <DDIcon name="whatsapp" size={26} />
-      </a>
+      <footer className="ftr">
+        <div className="wrap ftr-in">
+          <span className="ftr-legal">
+            © 2026 D&amp;D Imperium LLC · Doral, FL · Productos de muestra; reemplaza con tu
+            catálogo real.
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }
