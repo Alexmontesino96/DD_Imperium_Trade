@@ -526,10 +526,8 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
         </div>
       </div>
       {mobile ? (
-        <div className="ddi-container">
-          <div className="ddi-vid-frame">
-            <ProcessVideo />
-          </div>
+        <div className="ddi-vid-frame">
+          <ProcessVideo />
         </div>
       ) : (
       <div className="ddi-band-frame">

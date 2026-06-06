@@ -1083,5 +1083,28 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
   .ddi-nav-in { height: 62px; }
 }
 
-/* Mobile process video frame (16:9 replacement for horizontal band) */
-.ddi-vid-frame { position: relative; width: 100%; aspect-ratio: 1280 / 720; margin: 8px auto 0; border-radius: 18px; overflow: hidden; border: 1px solid var(--border-3); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+/* Mobile process video frame — full-bleed section on mobile */
+.ddi-vid-frame {
+  position: relative;
+  width: 100%;
+  min-height: 58vh;
+  margin: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border-1);
+  border-bottom: 1px solid var(--border-1);
+  background:
+    radial-gradient(58% 40% at 50% 50%, rgba(212,181,110,0.07), transparent 70%),
+    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-2) 50%, var(--canvas) 100%);
+}
+.ddi-vid-frame::before,
+.ddi-vid-frame::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-brand), transparent);
+  pointer-events: none;
+}
+.ddi-vid-frame::before { top: 14%; }
+.ddi-vid-frame::after { bottom: 14%; }
