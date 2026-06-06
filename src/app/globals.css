@@ -875,7 +875,15 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
   .ddi-section { padding: 64px 0; }
   .ddi-topbar-in { font-size: 11px; gap: 8px; }
   .ddi-link-partner { display: none; }
-  .ddi-trust-grid, .ddi-social-grid, .ddi-cred-cards, .ddi-services-grid { grid-template-columns: 1fr; }
+  .ddi-trust-grid, .ddi-cred-cards, .ddi-services-grid { grid-template-columns: 1fr; }
+  /* reviews -> horizontal swipe carousel */
+  .ddi-social-grid { display: flex; grid-template-columns: none; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; margin: 0 calc(var(--pad) * -1); padding: 4px var(--pad) 16px; scrollbar-width: none; }
+  .ddi-social-grid::-webkit-scrollbar { display: none; }
+  .ddi-social-grid > .ddi-quote-card { flex: 0 0 84%; scroll-snap-align: center; }
+  /* hard-question cards -> horizontal swipe carousel */
+  .ddi-trust-qa { flex-direction: row; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; margin: 0 calc(var(--pad) * -1); padding: 4px var(--pad) 16px; scrollbar-width: none; }
+  .ddi-trust-qa::-webkit-scrollbar { display: none; }
+  .ddi-trust-qa > .ddi-qa { flex: 0 0 86%; scroll-snap-align: center; flex-direction: column; }
   .ddi-cred-strip-row { gap: 20px; }
   .ddi-cred-divider { display: none; }
   .ddi-cred-strip-item { min-width: 42%; }
