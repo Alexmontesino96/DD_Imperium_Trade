@@ -12,7 +12,6 @@ import {
 } from "@/lib/animations";
 import { COL, MONO, SANS, ParcelBox, Vehicle } from "./ddi-video-parts";
 import { SectionLabel } from "./ddi-ui";
-import { ProcessVideo } from "./ProcessVideo";
 
 const W = 1760;
 const H = 440;
@@ -527,7 +526,23 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
       </div>
       {mobile ? (
         <div className="ddi-vid-frame">
-          <ProcessVideo />
+          <video
+            className="ddi-vid-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/prep-warehouse-poster.jpg"
+            aria-label={
+              lang === "es"
+                ? "El proceso en movimiento"
+                : "The process in motion"
+            }
+          >
+            <source src="/prep-warehouse.webm" type="video/webm" />
+            <source src="/prep-warehouse.mp4" type="video/mp4" />
+          </video>
         </div>
       ) : (
       <div className="ddi-band-frame">

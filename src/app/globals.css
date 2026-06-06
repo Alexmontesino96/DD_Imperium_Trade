@@ -446,7 +446,26 @@ a { color: inherit; text-decoration: none; }
 .ddi-hero-cta-row .ddi-btn-hero::after { content: ""; position: absolute; top: 0; bottom: 0; left: -52%; width: 30%; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-20deg); pointer-events: none; z-index: 1; animation: ddiShine 5s ease-in-out infinite; }
 .ddi-hero-cta-row .ddi-cta-arrow { width: 42px; height: 42px; color: var(--brand-light); background: linear-gradient(180deg, rgba(255,250,240,0.16), rgba(255,250,240,0.05)); border: 1px solid rgba(245,230,185,0.34); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .ddi-hero-cta-row .ddi-btn-hero:hover .ddi-cta-arrow { transform: translateX(5px); }
-@media (max-width: 680px) { .ddi-hero-cta-row .ddi-btn-hero { font-size: 17px; padding: 13px 13px 13px 30px; } .ddi-hero-cta-row .ddi-cta-arrow { width: 46px; height: 46px; } }
+@media (max-width: 680px) {
+  /* Hero — tighter, more compact mobile rhythm */
+  .ddi-hero-eyebrow { font-size: 11.5px; padding: 6px 13px; gap: 8px; }
+  .ddi-hero-title--xl { gap: 0; margin-top: 14px; }
+  .ddi-hero-title--xl .ddi-lead { font-size: 21px; font-weight: 600; }
+  .ddi-hero-emph--shine { font-size: clamp(30px, 9.2vw, 42px); letter-spacing: -1.4px; line-height: 1.02; }
+  .ddi-hero--statement .ddi-hero-sub { font-size: 14.5px; line-height: 1.55; margin-top: 14px; max-width: none; }
+  /* Compact CTA — give weight back to the headline */
+  .ddi-hero-cta-row { gap: 18px; margin-top: 22px; }
+  .ddi-hero-cta-row .ddi-btn-hero {
+    font-size: 14px; font-weight: 700; padding: 8px 8px 8px 22px;
+    gap: 10px; border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -6px 14px rgba(0,0,0,0.16), 0 8px 22px rgba(0,0,0,0.28);
+  }
+  .ddi-hero-cta-row .ddi-cta-arrow { width: 36px; height: 36px; }
+  .ddi-hero-ctanote { font-size: 11.5px; margin-top: 10px; }
+  .ddi-hero-stats { margin-top: 24px; gap: 14px; }
+  .ddi-hero-stat-num { font-size: 30px; }
+  .ddi-hero-stat-label { font-size: 10px; }
+}
 @media (prefers-reduced-motion: reduce) { .ddi-hero-cta-row .ddi-btn-hero::after { animation: none; opacity: 0; } }
 .ddi-hero-textlink:hover { color: var(--brand-light); gap: 11px; }
 
@@ -1108,3 +1127,18 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
 }
 .ddi-vid-frame::before { top: 14%; }
 .ddi-vid-frame::after { bottom: 14%; }
+.ddi-vid-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.18) saturate(1.28) brightness(1.04) hue-rotate(-10deg);
+}
+.ddi-vid-frame::after {
+  z-index: 2;
+}
+.ddi-vid-frame::before {
+  z-index: 2;
+}
