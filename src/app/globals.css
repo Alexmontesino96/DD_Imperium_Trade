@@ -1378,3 +1378,70 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
   .ddi-about-section { padding: 60px 0; }
   .ddi-about-cta { padding: 70px 0 90px; }
 }
+
+/* ============================================================
+   MOBILE — v10 tune-ups (last cascade wins)
+   ============================================================ */
+@media (max-width: 680px) {
+  /* Hero stats: forced 3-col with vertical dividers, no wrap */
+  .ddi-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 32px;
+  }
+  .ddi-hero-stat {
+    padding: 0 12px;
+    margin: 0;
+    border-right: 1px solid var(--border-2);
+    border-bottom: none;
+  }
+  .ddi-hero-stat:last-child { border-right: none; }
+  .ddi-hero-stat-num { font-size: 26px; line-height: 1.1; }
+  .ddi-hero-stat-label { font-size: 10px; letter-spacing: 0.4px; line-height: 1.3; margin-top: 7px; }
+  .ddi-hero-stat-sub { font-size: 9.5px; margin-top: 3px; }
+
+  /* Hero rail: horizontal label at bottom-left instead of rotated side rail */
+  .ddi-hero-rail {
+    display: block;
+    position: absolute;
+    left: var(--pad, 18px);
+    right: auto;
+    bottom: 70px;
+    top: auto;
+    transform: none;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1.6px;
+    color: var(--fg-4);
+    z-index: 4;
+    white-space: nowrap;
+  }
+  .ddi-hero-rail::before { display: none; }
+  .ddi-hero--statement .ddi-hero-rail { right: auto; left: var(--pad, 18px); }
+
+  /* Credibility strip: 2x2 with dividers between cells */
+  .ddi-cred-strip-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .ddi-cred-strip-item {
+    min-width: unset;
+    padding: 18px 16px;
+    border-right: 1px solid var(--border-1);
+    border-bottom: 1px solid var(--border-1);
+  }
+  .ddi-cred-strip-item:nth-child(2n) { border-right: none; }
+  .ddi-cred-strip-item:nth-last-child(-n+2) { border-bottom: none; }
+  .ddi-cred-divider { display: none; }
+  .ddi-cred-num { font-size: 26px; }
+  .ddi-cred-num em { font-size: 13px; }
+
+  /* Typography: tighter section H2 and sections */
+  .ddi-section { padding: 56px 0; }
+  .ddi-h2 { font-size: clamp(22px, 7vw, 32px); }
+
+  /* Evidence tiles: square (1:1) on mobile instead of 3:4 */
+  .ddi-evid-tile { aspect-ratio: 1 / 1; }
+}

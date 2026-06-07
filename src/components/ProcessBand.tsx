@@ -17,6 +17,7 @@ const W = 1760;
 const H = 440;
 const DUR = 11;
 const SX = [395, 880, 1365];
+const SX_COMPACT = [620, 880, 1140];
 const TY = 336;
 const PH: Array<[number, number]> = [
   [0.3, 3.5],
@@ -103,9 +104,9 @@ function BandBG() {
   );
 }
 
-function Track({ parcelX }: { parcelX: number }) {
-  const left = 150;
-  const right = 1610;
+function Track({ parcelX, compact }: { parcelX: number; compact: boolean }) {
+  const left = compact ? 560 : 150;
+  const right = compact ? 1200 : 1610;
   const fillW = clamp(parcelX - left, 0, right - left);
   return (
     <>
@@ -139,10 +140,12 @@ function Track({ parcelX }: { parcelX: number }) {
 
 function Station({
   i,
+  x,
   active,
   done,
 }: {
   i: number;
+  x: number;
   active: boolean;
   done: boolean;
 }) {
@@ -150,7 +153,7 @@ function Station({
     <div
       style={{
         position: "absolute",
-        left: SX[i],
+        left: x,
         top: TY,
         transform: "translate(-50%,-50%)",
         width: 92,
@@ -178,8 +181,11 @@ function Station({
   );
 }
 
-function BigTitle({ i, word }: { i: number; word: string }) {
+function BigTitle({ i, word, compact }: { i: number; word: string; compact: boolean }) {
   const [tin, tout] = PH[i];
+  const left = compact ? 540 : 132;
+  const top = compact ? 72 : 40;
+  const wordSize = compact ? 96 : 138;
   return (
     <Sprite start={tin} end={tout + 0.5}>
       {({ localTime, duration }) => {
@@ -194,8 +200,8 @@ function BigTitle({ i, word }: { i: number; word: string }) {
           <div
             style={{
               position: "absolute",
-              left: 132,
-              top: 40,
+              left,
+              top,
               opacity,
               transform: `translateX(${drift}px) scale(${scale})`,
               transformOrigin: "left center",
@@ -203,26 +209,28 @@ function BigTitle({ i, word }: { i: number; word: string }) {
             }}
           >
             <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontSize: 116,
-                  fontWeight: 700,
-                  lineHeight: 0.9,
-                  letterSpacing: "-4px",
-                  color: "transparent",
-                  WebkitTextStroke: "2px rgba(212,181,110,0.55)",
-                }}
-              >
-                0{i + 1}
-              </span>
+              {!compact && (
+                <span
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 116,
+                    fontWeight: 700,
+                    lineHeight: 0.9,
+                    letterSpacing: "-4px",
+                    color: "transparent",
+                    WebkitTextStroke: "2px rgba(212,181,110,0.55)",
+                  }}
+                >
+                  0{i + 1}
+                </span>
+              )}
               <span
                 style={{
                   fontFamily: SANS,
-                  fontSize: 138,
+                  fontSize: wordSize,
                   fontWeight: 800,
                   lineHeight: 0.86,
-                  letterSpacing: "-5px",
+                  letterSpacing: compact ? "-3px" : "-5px",
                   background: `linear-gradient(135deg, ${COL.goldLight}, ${COL.gold} 55%, ${COL.goldDark})`,
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
@@ -240,7 +248,7 @@ function BigTitle({ i, word }: { i: number; word: string }) {
   );
 }
 
-function SubLine({ i, text }: { i: number; text: string }) {
+function SubLine({ i, text, compact }: { i: number; text: string; compact: boolean }) {
   const [tin, tout] = PH[i];
   return (
     <Sprite start={tin + 0.35} end={tout + 0.2}>
@@ -251,13 +259,15 @@ function SubLine({ i, text }: { i: number; text: string }) {
           <div
             style={{
               position: "absolute",
-              left: 138,
-              top: 196,
+              left: compact ? 545 : 138,
+              top: compact ? 182 : 196,
+              width: compact ? 610 : "auto",
               opacity: e * (1 - out),
               transform: `translateX(${(1 - e) * 24}px)`,
               fontFamily: SANS,
-              fontSize: 23,
+              fontSize: compact ? 21 : 23,
               fontWeight: 500,
+              lineHeight: compact ? 1.35 : undefined,
               color: COL.dim,
               letterSpacing: "0.2px",
             }}
@@ -270,16 +280,16 @@ function SubLine({ i, text }: { i: number; text: string }) {
   );
 }
 
-function Chapters() {
+function Chapters({ compact }: { compact: boolean }) {
   const t = useTime();
   return (
     <div
       style={{
         position: "absolute",
-        left: 138,
+        left: compact ? 560 : 138,
         bottom: 30,
         display: "flex",
-        gap: 10,
+        gap: compact ? 8 : 10,
       }}
     >
       {[0, 1, 2].map((i) => {
@@ -288,7 +298,7 @@ function Chapters() {
         const done = t > e;
         const fill = active ? clamp((t - s) / (e - s), 0, 1) : done ? 1 : 0;
         return (
-          <div key={i} style={{ width: 120 }}>
+          <div key={i} style={{ width: compact ? 86 : 120 }}>
             <div
               style={{
                 height: 3,
@@ -317,17 +327,29 @@ function Scene({
   subs,
   outroLead,
   outroEmph,
+  compact,
 }: {
   words: [string, string, string];
   subs: [string, string, string];
   outroLead: string;
   outroEmph: string;
+  compact: boolean;
 }) {
   const t = useTime();
+  const stationX = compact ? SX_COMPACT : SX;
 
   const px = interpolate(
     [0.3, 1.0, 3.5, 4.2, 6.9, 7.6, 10.0, 10.7],
-    [SX[0] - 280, SX[0], SX[0], SX[1], SX[1], SX[2], SX[2], W + 260],
+    [
+      stationX[0] - 280,
+      stationX[0],
+      stationX[0],
+      stationX[1],
+      stationX[1],
+      stationX[2],
+      stationX[2],
+      compact ? stationX[2] + 460 : W + 260,
+    ],
     [
       Easing.easeOutCubic,
       Easing.linear,
@@ -355,7 +377,12 @@ function Scene({
 
   const truckX = interpolate(
     [6.7, 7.5, 9.8, 10.9],
-    [W + 40, SX[2] + 30, SX[2] + 30, W + 420],
+    [
+      compact ? stationX[2] + 430 : W + 40,
+      stationX[2] + 30,
+      stationX[2] + 30,
+      compact ? stationX[2] + 520 : W + 420,
+    ],
     [Easing.easeOutCubic, Easing.linear, Easing.easeInCubic]
   )(t);
   const truckShow = t > 6.7 && t < 10.9;
@@ -369,11 +396,12 @@ function Scene({
   return (
     <div style={sceneStyle}>
       <BandBG />
-      <Track parcelX={px} />
+      <Track parcelX={px} compact={compact} />
       {[0, 1, 2].map((i) => (
         <Station
           key={i}
           i={i}
+          x={stationX[i]}
           active={activeIdx === i}
           done={t > PH[i][1]}
         />
@@ -428,11 +456,11 @@ function Scene({
       )}
 
       {[0, 1, 2].map((i) => (
-        <BigTitle key={i} i={i} word={words[i]} />
+        <BigTitle key={i} i={i} word={words[i]} compact={compact} />
       ))}
-      <SubLine i={0} text={subs[0]} />
-      <SubLine i={1} text={subs[1]} />
-      <SubLine i={2} text={subs[2]} />
+      <SubLine i={0} text={subs[0]} compact={compact} />
+      <SubLine i={1} text={subs[1]} compact={compact} />
+      <SubLine i={2} text={subs[2]} compact={compact} />
 
       <Sprite start={10.1} end={11}>
         {({ localTime }) => {
@@ -441,8 +469,9 @@ function Scene({
             <div
               style={{
                 position: "absolute",
-                left: 132,
-                top: 120,
+                left: compact ? 540 : 132,
+                top: compact ? 88 : 120,
+                width: compact ? 650 : "auto",
                 opacity: clamp(localTime / 0.35, 0, 1),
                 transform: `scale(${0.7 + e * 0.3})`,
                 transformOrigin: "left center",
@@ -451,7 +480,7 @@ function Scene({
               <div
                 style={{
                   fontFamily: SANS,
-                  fontSize: 30,
+                  fontSize: compact ? 24 : 30,
                   fontWeight: 600,
                   color: COL.dim,
                 }}
@@ -461,10 +490,10 @@ function Scene({
               <div
                 style={{
                   fontFamily: SANS,
-                  fontSize: 96,
+                  fontSize: compact ? 58 : 96,
                   fontWeight: 800,
                   fontStyle: "italic",
-                  letterSpacing: "-4px",
+                  letterSpacing: compact ? "-2px" : "-4px",
                   color: COL.gold,
                   lineHeight: 0.92,
                   textShadow: "0 10px 50px rgba(0,0,0,0.5)",
@@ -477,17 +506,19 @@ function Scene({
         }}
       </Sprite>
 
-      <Chapters />
+      <Chapters compact={compact} />
     </div>
   );
 }
 
 export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
   const [boost, setBoost] = useState(1);
+  const [compact, setCompact] = useState(false);
 
   useEffect(() => {
     const fn = () => {
       const w = window.innerWidth;
+      setCompact(w <= 700);
       if (w <= 480) setBoost(2.4);
       else if (w <= 700) setBoost(2);
       else if (w <= 900) setBoost(1.5);
@@ -536,6 +567,7 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
             subs={subs}
             outroLead={outroLead}
             outroEmph={outroEmph}
+            compact={compact}
           />
         </Stage>
       </div>
