@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  style: ["normal", "italic"],
+const dmSans = localFont({
+  src: [
+    {
+      path: "./fonts/DMSans-VariableFont_opsz,wght.ttf",
+      style: "normal",
+      weight: "100 1000",
+    },
+    {
+      path: "./fonts/DMSans-Italic-VariableFont_opsz,wght.ttf",
+      style: "italic",
+      weight: "100 1000",
+    },
+  ],
   variable: "--font-dm-sans",
   display: "swap",
 });
