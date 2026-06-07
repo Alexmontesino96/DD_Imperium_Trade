@@ -94,7 +94,7 @@ export function Hero({ c }: { c: Copy; onSample?: () => void }) {
         </div>
         <p className="ddi-hero-sub">{c.hero.sub}</p>
         <div className="ddi-hero-cta-row">
-          <Link href="/catalogo" className="ddi-btn ddi-btn-primary ddi-btn-hero">
+          <Link href="/#contact" className="ddi-btn ddi-btn-primary ddi-btn-hero">
             <span className="ddi-btn-hero-label">{c.hero.ctaSecondary}</span>
             <span className="ddi-cta-arrow">
               <DDIcon name="arrow" size={18} />

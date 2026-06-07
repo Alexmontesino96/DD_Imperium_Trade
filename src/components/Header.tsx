@@ -1,16 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { CSSProperties, useEffect, useState } from "react";
 import { data as DDI_DATA, type Copy, type Lang } from "@/lib/ddi-data";
 import { DDIcon, DDILogo } from "./ddi-ui";
 
 type NavKey = "home" | "catalog" | "prep" | "about" | "contact";
 const NAV: Array<[NavKey, string]> = [
-  ["home", "#top"],
+  ["home", "/"],
   ["catalog", "/catalogo"],
-  ["prep", "#prep"],
+  ["prep", "/#prep"],
   ["about", "/sobre-nosotros"],
-  ["contact", "#contact"],
+  ["contact", "/#contact"],
 ];
 
 export function Header({
@@ -62,9 +63,9 @@ export function Header({
       </div>
       <div className="ddi-navbar">
         <div className="ddi-container ddi-nav-in">
-          <a href="#top" className="ddi-brand">
+          <Link href="/" className="ddi-brand">
             <DDILogo size={34} />
-          </a>
+          </Link>
           <nav className="ddi-nav-links">
             {NAV.map(([k, href]) =>
               k === "catalog" ? (
@@ -115,9 +116,9 @@ export function Header({
         <div className="ddi-mobile-scrim" onClick={closeMenu} />
         <div className="ddi-mobile-panel">
           <div className="ddi-mobile-top">
-            <a href="#top" className="ddi-brand" onClick={closeMenu}>
+            <Link href="/" className="ddi-brand" onClick={closeMenu}>
               <DDILogo size={32} />
-            </a>
+            </Link>
             <button className="ddi-mobile-close" aria-label="Cerrar" onClick={closeMenu}>
               <DDIcon name="close" size={20} />
             </button>
