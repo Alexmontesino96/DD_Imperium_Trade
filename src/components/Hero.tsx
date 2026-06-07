@@ -16,7 +16,30 @@ function HeroStat({ stat, label, run }: { stat: HeroStatType; label: string; run
   );
 }
 
-export function Hero({ c }: { c: Copy; onSample?: () => void }) {
+function HeroAurora({ c }: { c: Copy }) {
+  void c;
+  return (
+    <section className="ddi-hero ddi-hero--aurora" aria-label="Aurora hero">
+      <div className="ddi-aurora-field" aria-hidden="true" />
+      <div className="ddi-aurora-grain" aria-hidden="true" />
+      <div className="ddi-container ddi-hero-aurora-in">
+        <div className="ddi-aurora-words">
+          <span className="ddi-aurora-w">
+            Marcas<span className="ddi-aurora-dot">.</span>
+          </span>
+          <span className="ddi-aurora-w">
+            Mercado<span className="ddi-aurora-dot">.</span>
+          </span>
+          <span className="ddi-aurora-w">
+            Conexión<span className="ddi-aurora-dot">.</span>
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function Hero({ c, aurora = false }: { c: Copy; onSample?: () => void; aurora?: boolean }) {
   const statsRef = useRef<HTMLDivElement | null>(null);
   const [statsRun, setStatsRun] = useState(false);
 
@@ -41,6 +64,8 @@ export function Hero({ c }: { c: Copy; onSample?: () => void }) {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  if (aurora) return <HeroAurora c={c} />;
 
   return (
     <section className="ddi-hero ddi-hero--statement">

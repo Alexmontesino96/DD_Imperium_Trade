@@ -1102,43 +1102,172 @@ image-slot { --slot-ink: var(--fg-3); --slot-bg: var(--surface-2); --slot-ring: 
   .ddi-nav-in { height: 62px; }
 }
 
-/* Mobile process video frame — full-bleed section on mobile */
+/* Process video frame — same warehouse video on desktop + mobile */
 .ddi-vid-frame {
   position: relative;
   width: 100%;
-  min-height: 58vh;
-  margin: 0;
-  overflow: hidden;
-  border-top: 1px solid var(--border-1);
-  border-bottom: 1px solid var(--border-1);
-  background:
-    radial-gradient(58% 40% at 50% 50%, rgba(212,181,110,0.07), transparent 70%),
-    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-2) 50%, var(--canvas) 100%);
+  max-width: var(--maxw);
+  aspect-ratio: 16 / 9;
+  margin: 8px auto 0;
+  padding: 0 var(--pad);
+  overflow: visible;
 }
-.ddi-vid-frame::before,
-.ddi-vid-frame::after {
-  content: "";
-  position: absolute;
-  left: 6%;
-  right: 6%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-brand), transparent);
-  pointer-events: none;
-}
-.ddi-vid-frame::before { top: 14%; }
-.ddi-vid-frame::after { bottom: 14%; }
-.ddi-vid-video {
-  position: absolute;
-  inset: 0;
+.ddi-vid-frame > .ddi-vid-video {
+  position: relative;
+  inset: auto;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid var(--border-2);
+  box-shadow: 0 28px 70px rgba(0,0,0,0.5);
   filter: contrast(1.18) saturate(1.28) brightness(1.04) hue-rotate(-10deg);
 }
-.ddi-vid-frame::after {
-  z-index: 2;
+
+/* Mobile — full-bleed section feel */
+@media (max-width: 700px) {
+  .ddi-vid-frame {
+    max-width: none;
+    aspect-ratio: auto;
+    min-height: 58vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-top: 1px solid var(--border-1);
+    border-bottom: 1px solid var(--border-1);
+    background:
+      radial-gradient(58% 40% at 50% 50%, rgba(212,181,110,0.07), transparent 70%),
+      linear-gradient(180deg, var(--canvas) 0%, var(--canvas-2) 50%, var(--canvas) 100%);
+  }
+  .ddi-vid-frame::before,
+  .ddi-vid-frame::after {
+    content: "";
+    position: absolute;
+    left: 6%; right: 6%;
+    height: 1px; z-index: 2;
+    background: linear-gradient(90deg, transparent, var(--border-brand), transparent);
+    pointer-events: none;
+  }
+  .ddi-vid-frame::before { top: 14%; }
+  .ddi-vid-frame::after { bottom: 14%; }
+  .ddi-vid-frame > .ddi-vid-video {
+    position: absolute;
+    inset: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
 }
-.ddi-vid-frame::before {
+
+/* ============================================================
+   AURORA TOGGLE (test mini button in topbar)
+   ============================================================ */
+.ddi-aurora-toggle {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 11px 4px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-3);
+  background: rgba(255,250,240,0.04);
+  color: var(--fg-3);
+  font-family: inherit; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all var(--d-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.ddi-aurora-toggle:hover { color: var(--brand-light); border-color: var(--border-brand); background: var(--brand-tint); }
+.ddi-aurora-toggle.active { color: var(--cta-fg); background: var(--cta-gradient); border-color: transparent; box-shadow: 0 0 0 1px rgba(212,181,110,0.4), 0 4px 14px rgba(154,124,67,0.32); }
+.ddi-aurora-beta {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  opacity: 0.7;
+}
+.ddi-aurora-toggle.active .ddi-aurora-beta { background: rgba(0,0,0,0.22); opacity: 0.92; }
+
+/* ============================================================
+   HERO — Aurora variant (V6: glow field + floating words)
+   ============================================================ */
+.ddi-hero--aurora {
+  position: relative;
+  min-height: 86vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--canvas);
+}
+.ddi-aurora-field {
+  position: absolute; inset: -40%;
+  background:
+    radial-gradient(38% 50% at 28% 40%, rgba(212,181,110,0.32), transparent 60%),
+    radial-gradient(34% 46% at 70% 60%, rgba(74,222,128,0.20), transparent 62%),
+    radial-gradient(30% 40% at 82% 26%, rgba(56,189,248,0.18), transparent 60%);
+  filter: blur(14px);
+  animation: ddiAuroraFade 1s ease forwards, ddiAuroraSpin 22s linear infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+@keyframes ddiAuroraFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ddiAuroraSpin { to { transform: rotate(360deg) scale(1.05); } }
+
+.ddi-aurora-grain {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 0.5px, transparent 0.5px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.ddi-hero-aurora-in {
+  position: relative;
   z-index: 2;
+  width: 100%;
+}
+.ddi-aurora-words {
+  font-family: var(--font-sans);
+  font-size: clamp(40px, 7vw, 96px);
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.3em;
+  text-shadow: 0 6px 40px rgba(0,0,0,0.5);
+}
+.ddi-aurora-w {
+  color: var(--fg-1);
+  opacity: 0;
+  transform: translateY(20px) scale(0.96);
+  animation:
+    ddiAuroraIn 0.8s var(--ease-out) forwards,
+    ddiAuroraFloat 6s ease-in-out infinite;
+  display: inline-block;
+}
+.ddi-aurora-w:nth-child(1) { color: var(--brand-light); animation-delay: 0.2s, 1s; }
+.ddi-aurora-w:nth-child(2) { animation-delay: 0.42s, 1.3s; }
+.ddi-aurora-w:nth-child(3) { color: #d8ead0; animation-delay: 0.64s, 1.6s; }
+.ddi-aurora-dot { color: var(--brand-primary); }
+
+@keyframes ddiAuroraIn { to { opacity: 1; transform: none; } }
+@keyframes ddiAuroraFloat {
+  0%, 100% { transform: translateY(-3px); }
+  50% { transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ddi-aurora-field { animation: ddiAuroraFade 1s ease forwards !important; }
+  .ddi-aurora-w { animation: ddiAuroraIn 0.8s var(--ease-out) forwards !important; }
+}
+
+@media (max-width: 680px) {
+  .ddi-aurora-toggle { font-size: 10px; padding: 3px 9px 3px 7px; gap: 5px; }
+  .ddi-aurora-beta { font-size: 8px; padding: 2px 4px; }
+  .ddi-hero--aurora { min-height: 70vh; }
 }

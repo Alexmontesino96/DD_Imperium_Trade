@@ -19,12 +19,16 @@ export function Header({
   setLang,
   onCatalog,
   onPartner,
+  aurora = false,
+  setAurora,
 }: {
   c: Copy;
   lang: Lang;
   setLang: (l: Lang) => void;
   onCatalog: () => void;
   onPartner: () => void;
+  aurora?: boolean;
+  setAurora?: (on: boolean) => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -58,6 +62,20 @@ export function Header({
             <DDIcon name="mail" size={13} style={{ verticalAlign: "-2px", marginRight: 6 }} />
             {DDI_DATA.email}
           </a>
+          {setAurora && (
+            <button
+              type="button"
+              className={"ddi-aurora-toggle" + (aurora ? " active" : "")}
+              onClick={() => setAurora(!aurora)}
+              aria-pressed={aurora}
+              aria-label="Toggle Aurora hero variant"
+              title="Variante Aurora (prueba)"
+            >
+              <DDIcon name="spark" size={11} stroke={aurora ? "var(--cta-fg)" : "var(--brand-mid)"} />
+              <span>Aurora</span>
+              <span className="ddi-aurora-beta">BETA</span>
+            </button>
+          )}
         </div>
       </div>
       <div className="ddi-navbar">
