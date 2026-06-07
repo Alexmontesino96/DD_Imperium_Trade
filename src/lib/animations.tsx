@@ -107,12 +107,14 @@ export function Stage({
   height,
   duration,
   background = "transparent",
+  scaleBoost = 1,
   children,
 }: {
   width: number;
   height: number;
   duration: number;
   background?: string;
+  scaleBoost?: number;
   children: ReactNode;
 }) {
   const [time, setTime] = useState(0);
@@ -126,7 +128,7 @@ export function Stage({
     if (!el) return;
     const measure = () => {
       const s = Math.min(el.clientWidth / width, el.clientHeight / height);
-      setScale(Math.max(0.05, s));
+      setScale(Math.max(0.05, s) * scaleBoost);
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -136,7 +138,7 @@ export function Stage({
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [width, height]);
+  }, [width, height, scaleBoost]);
 
   useEffect(() => {
     const step = (ts: number) => {

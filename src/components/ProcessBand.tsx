@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { type Copy } from "@/lib/ddi-data";
 import {
   Easing,
@@ -483,6 +483,21 @@ function Scene({
 }
 
 export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
+  const [boost, setBoost] = useState(1);
+
+  useEffect(() => {
+    const fn = () => {
+      const w = window.innerWidth;
+      if (w <= 480) setBoost(2.4);
+      else if (w <= 700) setBoost(2);
+      else if (w <= 900) setBoost(1.5);
+      else setBoost(1);
+    };
+    fn();
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+
   const words: [string, string, string] =
     lang === "es"
       ? ["Abastecemos", "Preparamos", "Enviamos"]
@@ -515,7 +530,7 @@ export function ProcessBand({ c, lang }: { c: Copy; lang: "es" | "en" }) {
         </div>
       </div>
       <div className="ddi-band-frame">
-        <Stage width={W} height={H} duration={DUR} background={COL.bg}>
+        <Stage width={W} height={H} duration={DUR} background={COL.bg} scaleBoost={boost}>
           <Scene
             words={words}
             subs={subs}
