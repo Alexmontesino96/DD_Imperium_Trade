@@ -74,7 +74,6 @@ export function Hero({ c }: { c: Copy; onSample?: () => void }) {
           <span className="ddi-livedot" />
           {c.hero.eyebrow}
         </div>
-        <div className="ddi-hero-lead-mono">{c.hero.lead}</div>
         <div className="ddi-hero-3words">
           {words.map((w, i) => (
             <span key={i} className="ddi-3w" style={{ "--wi": i } as CSSProperties}>
