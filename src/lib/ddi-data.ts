@@ -66,8 +66,24 @@ export const data = {
   steps: ["source", "prep", "ship"] as const,
 
   team: [
-    { name: "Dariel Gudas", role: { es: "CEO · Fundador", en: "CEO · Founder" }, initials: "DG" },
-    { name: "Daiana Robaina", role: { es: "Manager de Operaciones", en: "Operations Manager" }, initials: "DR" },
+    {
+      name: "Dariel Gudas",
+      role: { es: "CEO · Fundador", en: "CEO · Founder" },
+      initials: "DG",
+      bio: {
+        es: "Construye la relación con marcas y dirige la operación de extremo a extremo. Responde por cada acuerdo.",
+        en: "Builds brand relationships and drives the end-to-end operation. Answers for every agreement.",
+      },
+    },
+    {
+      name: "Daiana Robaina",
+      role: { es: "Manager de Operaciones", en: "Operations Manager" },
+      initials: "DR",
+      bio: {
+        es: "Lidera el Prep Center y la cadena de envío. Cada lote pasa por su control antes de salir.",
+        en: "Leads the Prep Center and the shipping chain. Every lot clears her check before it ships.",
+      },
+    },
   ],
 
   testimonials: [
@@ -163,6 +179,7 @@ export const copy = {
       supports: "Soportamos los marketplaces donde ya vendes",
       tickerLabel: "Categorías · Marketplaces",
       proofLabels: ["cumplimiento Amazon & Walmart", "categorías de producto", "marketplaces soportados"],
+      proofSubs: ["Prep Center propio", "desde el primer pedido", "etiquetado conforme"],
       lead: "Distribuidora · Amazon & Walmart",
       emph: "Marcas. Mercado. Conexión.",
       sub: "Prep Center propio en Miami. Abastecemos, preparamos y enviamos a Amazon y Walmart.",
@@ -312,6 +329,7 @@ export const copy = {
       supports: "We support the marketplaces you already sell on",
       tickerLabel: "Categories · Marketplaces",
       proofLabels: ["Amazon & Walmart compliance", "product categories", "marketplaces supported"],
+      proofSubs: ["Own Prep Center", "from your first order", "compliant labeling"],
       lead: "Distributor · Amazon & Walmart",
       emph: "Brands. Market. Connection.",
       sub: "Own Prep Center in Miami. We source, prep, and ship to Amazon and Walmart.",

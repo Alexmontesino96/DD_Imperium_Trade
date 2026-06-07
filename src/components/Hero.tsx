@@ -5,13 +5,24 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { data as DDI_DATA, type Copy, type HeroStat as HeroStatType } from "@/lib/ddi-data";
 import { DDIcon, useCountUp } from "./ddi-ui";
 
-function HeroStat({ stat, label, run }: { stat: HeroStatType; label: string; run: boolean }) {
+function HeroStat({
+  stat,
+  label,
+  sub,
+  run,
+}: {
+  stat: HeroStatType;
+  label: string;
+  sub?: string;
+  run: boolean;
+}) {
   const v = useCountUp(stat.to, run);
   const txt = stat.prefix + v.toFixed(stat.decimals) + stat.suffix;
   return (
     <div className={"ddi-hero-stat" + (run ? " run" : "")}>
       <div className="ddi-hero-stat-num mono">{txt}</div>
       <div className="ddi-hero-stat-label">{label}</div>
+      {sub && <div className="ddi-hero-stat-sub">{sub}</div>}
     </div>
   );
 }
@@ -93,7 +104,13 @@ export function Hero({ c }: { c: Copy; onSample?: () => void }) {
         <p className="ddi-hero-ctanote">{c.hero.note}</p>
         <div className="ddi-hero-stats" ref={statsRef}>
           {DDI_DATA.heroStats.map((s, i) => (
-            <HeroStat key={i} stat={s} label={c.hero.proofLabels[i]} run={statsRun} />
+            <HeroStat
+              key={i}
+              stat={s}
+              label={c.hero.proofLabels[i]}
+              sub={c.hero.proofSubs?.[i]}
+              run={statsRun}
+            />
           ))}
         </div>
       </div>

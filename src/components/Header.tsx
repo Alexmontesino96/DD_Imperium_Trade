@@ -9,7 +9,7 @@ const NAV: Array<[NavKey, string]> = [
   ["home", "#top"],
   ["catalog", "/catalogo"],
   ["prep", "#prep"],
-  ["about", "#trust"],
+  ["about", "/sobre-nosotros"],
   ["contact", "#contact"],
 ];
 
