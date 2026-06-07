@@ -15,25 +15,17 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   const [lang, setLangState] = useState<Lang>("es");
-  const [aurora, setAuroraState] = useState(false);
   const partnerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const storedLang = localStorage.getItem("ddi-lang") as Lang | null;
     if (storedLang === "es" || storedLang === "en") setLangState(storedLang);
-    setAuroraState(localStorage.getItem("ddi-aurora") === "on");
   }, []);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     if (typeof window !== "undefined") localStorage.setItem("ddi-lang", l);
-  }, []);
-
-  const setAurora = useCallback((on: boolean) => {
-    setAuroraState(on);
-    if (typeof window !== "undefined")
-      localStorage.setItem("ddi-aurora", on ? "on" : "off");
   }, []);
 
   useEffect(() => {
@@ -68,8 +60,7 @@ export default function Home() {
       className="ddi-root"
       data-theme="dark"
       data-accent="champagne"
-      data-bg="malla"
-      data-aurora={aurora ? "on" : "off"}
+      data-bg="aurora"
     >
       <Header
         c={c}
@@ -77,11 +68,9 @@ export default function Home() {
         setLang={setLang}
         onCatalog={onCatalog}
         onPartner={onPartner}
-        aurora={aurora}
-        setAurora={setAurora}
       />
       <main>
-        <Hero c={c} aurora={aurora} />
+        <Hero c={c} />
         <Credibility c={c} />
         <ProcessBand c={c} lang={lang} />
         <PrepCenter c={c} onPartner={onPartner} />

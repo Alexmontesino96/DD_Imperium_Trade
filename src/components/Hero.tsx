@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { data as DDI_DATA, type Copy, type HeroStat as HeroStatType } from "@/lib/ddi-data";
 import { DDIcon, useCountUp } from "./ddi-ui";
 
@@ -16,30 +16,7 @@ function HeroStat({ stat, label, run }: { stat: HeroStatType; label: string; run
   );
 }
 
-function HeroAurora({ c }: { c: Copy }) {
-  void c;
-  return (
-    <section className="ddi-hero ddi-hero--aurora" aria-label="Aurora hero">
-      <div className="ddi-aurora-field" aria-hidden="true" />
-      <div className="ddi-aurora-grain" aria-hidden="true" />
-      <div className="ddi-container ddi-hero-aurora-in">
-        <div className="ddi-aurora-words">
-          <span className="ddi-aurora-w">
-            Marcas<span className="ddi-aurora-dot">.</span>
-          </span>
-          <span className="ddi-aurora-w">
-            Mercado<span className="ddi-aurora-dot">.</span>
-          </span>
-          <span className="ddi-aurora-w">
-            Conexión<span className="ddi-aurora-dot">.</span>
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function Hero({ c, aurora = false }: { c: Copy; onSample?: () => void; aurora?: boolean }) {
+export function Hero({ c }: { c: Copy; onSample?: () => void }) {
   const statsRef = useRef<HTMLDivElement | null>(null);
   const [statsRun, setStatsRun] = useState(false);
 
@@ -65,22 +42,24 @@ export function Hero({ c, aurora = false }: { c: Copy; onSample?: () => void; au
     return () => obs.disconnect();
   }, []);
 
-  if (aurora) return <HeroAurora c={c} />;
+  const words = c.hero.emph.split(" ");
 
   return (
     <section className="ddi-hero ddi-hero--statement">
       <div className="ddi-hero-fx" aria-hidden="true">
+        <div className="ddi-hero-aurora" />
+        <div className="ddi-hero-grain" />
         <div className="ddi-hero-glow" />
         <div className="ddi-hero-grid" />
         <div className="ddi-hero-vline" />
         <div className="ddi-hero-lines">
           <span
             className="ddi-route"
-            style={{ top: "32%", "--dur": "11s", "--delay": "0s" } as React.CSSProperties}
+            style={{ top: "32%", "--dur": "11s", "--delay": "0s" } as CSSProperties}
           />
           <span
             className="ddi-route"
-            style={{ top: "68%", "--dur": "14s", "--delay": "3.5s" } as React.CSSProperties}
+            style={{ top: "68%", "--dur": "14s", "--delay": "3.5s" } as CSSProperties}
           />
         </div>
         <span className="ddi-hero-watermark" aria-hidden="true">
@@ -95,11 +74,15 @@ export function Hero({ c, aurora = false }: { c: Copy; onSample?: () => void; au
           <span className="ddi-livedot" />
           {c.hero.eyebrow}
         </div>
-        <h1 className="ddi-hero-title ddi-hero-title--xl">
-          <span className="ddi-lead">{c.hero.lead}</span>
-          <em className="ddi-hero-emph ddi-hero-emph--shine">{c.hero.emph}</em>
-        </h1>
-        <p className="ddi-hero-sub" dangerouslySetInnerHTML={{ __html: c.hero.sub }} />
+        <div className="ddi-hero-lead-mono">{c.hero.lead}</div>
+        <div className="ddi-hero-3words">
+          {words.map((w, i) => (
+            <span key={i} className="ddi-3w" style={{ "--wi": i } as CSSProperties}>
+              {w}
+            </span>
+          ))}
+        </div>
+        <p className="ddi-hero-sub">{c.hero.sub}</p>
         <div className="ddi-hero-cta-row">
           <Link href="/catalogo" className="ddi-btn ddi-btn-primary ddi-btn-hero">
             <span className="ddi-btn-hero-label">{c.hero.ctaSecondary}</span>
