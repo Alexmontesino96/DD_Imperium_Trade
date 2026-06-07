@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { data as DDI_DATA } from "@/lib/ddi-data";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { copy, data as DDI_DATA, type Lang } from "@/lib/ddi-data";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
 
 type CategoryId = "all" | "beauty" | "grocery" | "house";
 
@@ -40,15 +42,6 @@ function CheckIcon({ size = 17 }: { size?: number }) {
   );
 }
 
-function ArrowLeftIcon() {
-  return (
-    <svg className="ic" width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 12H5M11 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
 function ArrowRightIcon() {
   return (
     <svg className="ic" width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -82,7 +75,26 @@ function useReveal() {
 
 export function CatalogClient() {
   const [active, setActive] = useState<CategoryId>("all");
+  const [lang, setLangState] = useState<Lang>("es");
   const rootRef = useReveal();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("ddi-lang") as Lang | null;
+    if (stored === "es" || stored === "en") setLangState(stored);
+  }, []);
+
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    if (typeof window !== "undefined") localStorage.setItem("ddi-lang", l);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const c = copy[lang];
+  const noop = () => {};
 
   const products = DDI_DATA.sampleCatalog;
 
@@ -116,25 +128,14 @@ export function CatalogClient() {
   }, [active, rootRef]);
 
   return (
-    <div ref={rootRef} className="ddi-root ddi-cat-page" data-theme="dark" data-accent="champagne" data-bg="malla">
-      <header className="hdr">
-        <div className="wrap hdr-in">
-          <Link className="brand" href="/">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="logo-mark" src="/ddi-logo.png" alt="D&D Imperium Trade" />
-            <span className="brand-word">Imperium <b>Trade</b></span>
-          </Link>
-          <div className="hdr-actions">
-            <Link className="hdr-back" href="/">
-              <ArrowLeftIcon />
-              Inicio
-            </Link>
-            <Link className="cat-btn" href="/#contact">
-              Solicita el catálogo
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div
+      ref={rootRef}
+      className="ddi-root ddi-cat-page"
+      data-theme="dark"
+      data-accent="champagne"
+      data-bg="aurora"
+    >
+      <Header c={c} lang={lang} setLang={setLang} onCatalog={noop} onPartner={noop} />
 
       <section className="cat-hero">
         <div className="wrap">
@@ -257,14 +258,7 @@ export function CatalogClient() {
         </div>
       </section>
 
-      <footer className="ftr">
-        <div className="wrap ftr-in">
-          <span className="ftr-legal">
-            © 2026 D&amp;D Imperium LLC · Doral, FL · Productos de muestra; reemplaza con tu
-            catálogo real.
-          </span>
-        </div>
-      </footer>
+      <Footer c={c} />
     </div>
   );
 }
